@@ -1,5 +1,4 @@
 from pathlib import Path
-from math import floor
 data_folder = Path("./PuzzleData/")
 
 file_to_open = data_folder / "Day2.txt"
