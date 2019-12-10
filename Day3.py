@@ -25,25 +25,43 @@ def getNextPositions(move, currentPosition):
 
 def getWirePositions(wire):
     wirePositions = []
+    stepsPerPoint = {}
+    steps = 0
     currentPosition = [0, 0]
     for move in wire:
         nextPosition = getNextPositions(move, currentPosition)
         wirePositions.append(nextPosition)
         currentPosition = nextPosition[-1]
-    return wirePositions
+        updateSteps(nextPosition, stepsPerPoint, int(move[1:]), steps)
+        
+    return wirePositions, stepsPerPoint
+
+def updateSteps(nextPositions, stepsPerPoint, move, steps):
+    for position in nextPositions:
+        if((position[0], position[1]) not in stepsPerPoint):
+                steps += move
+                stepsPerPoint[(position[0], position[1])] = steps
 
 def getManhattanDistance(a, b):
     return abs(a[0] - b[0]) + abs(b[1] - a[1])
 
-wireOnePositions = list(itertools.chain(*getWirePositions(wireMoves[0])))
-wireTwoPositions = list(itertools.chain(*getWirePositions(wireMoves[1])))
+# def getMinTotalSteps()
+
+wireOnePositions, steps1 = getWirePositions(wireMoves[0])
+wireOnePositions = list(itertools.chain(*wireOnePositions))
+
+wireTwoPositions, steps2 = getWirePositions(wireMoves[1])
+wireTwoPositions = list(itertools.chain(*wireTwoPositions))
 
 # Graph it for fun :)
-plt.scatter(*zip(*wireOnePositions))
-plt.scatter(*zip(*wireTwoPositions))
-plt.show()
+# plt.scatter(*zip(*wireOnePositions))
+# plt.scatter(*zip(*wireTwoPositions))
+# plt.show()
 
 intersections =  set([(point[0], point[1]) for point in wireOnePositions ]).intersection(set([(point[0], point[1]) for point in wireTwoPositions ]))
-distances = [getManhattanDistance([0, 0], point) for point in intersections]
 
-print(min(distances))
+distances = [getManhattanDistance([0, 0], point) for point in intersections]
+totalSteps = [steps1[point] + steps2[point] for point in intersections]
+
+print('Part 1: ', min(distances))
+print('Part 2: ', min(totalSteps))
