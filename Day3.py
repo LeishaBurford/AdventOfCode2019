@@ -1,5 +1,4 @@
 from pathlib import Path
-import numpy as np
 import itertools
 import matplotlib.pyplot as plt
 
@@ -32,15 +31,16 @@ def getWirePositions(wire):
         nextPosition = getNextPositions(move, currentPosition)
         wirePositions.append(nextPosition)
         currentPosition = nextPosition[-1]
-        updateSteps(nextPosition, stepsPerPoint, int(move[1:]), steps)
+        steps = updateSteps(nextPosition, stepsPerPoint,steps)
         
     return wirePositions, stepsPerPoint
 
-def updateSteps(nextPositions, stepsPerPoint, move, steps):
+def updateSteps(nextPositions, stepsPerPoint, steps):
     for position in nextPositions:
+        steps += 1
         if((position[0], position[1]) not in stepsPerPoint):
-                steps += move
                 stepsPerPoint[(position[0], position[1])] = steps
+    return steps
 
 def getManhattanDistance(a, b):
     return abs(a[0] - b[0]) + abs(b[1] - a[1])
