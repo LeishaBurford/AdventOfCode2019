@@ -7,6 +7,21 @@ def isIncreasing(number):
 
 
 def containsAdjacentDuplicate(number):
+    digits = [int(i) for i in list(str(number))]
+    if len(set(digits)) == len(digits):
+        return False
+    lastSeen = (-1, -1)
+    for i, digit in enumerate(digits):
+        if digit != lastSeen[0]:
+            if i - lastSeen[1] == 2:
+                return True
+            lastSeen = (digit, i)
+    if len(digits) - lastSeen[1] == 2:
+        return True
+    return False
+
+
+def containsAdjacentDuplicatePart1(number):
     digits = list(str(number))
     if len(set(digits)) == len(digits):
         return False
@@ -22,4 +37,8 @@ maximum = 675810
 possiblePasswords = [i for i in range(
     minimum, maximum + 1) if isIncreasing(i) and containsAdjacentDuplicate(i)]
 
-print('Part 1: ', len(possiblePasswords))
+possiblePasswordsPart1 = [i for i in range(
+    minimum, maximum + 1) if isIncreasing(i) and containsAdjacentDuplicatePart1(i)]
+
+print('Part 1: ', len(possiblePasswordsPart1))
+print('Part 2: ', len(possiblePasswords))
