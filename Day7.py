@@ -31,6 +31,9 @@ class Amplifier:
 
     def halted(self):
         return self.programStatus == 'HALT'
+    
+    def __str__(self):
+        return f'{self.name}\n{self.programStatus}\n{self.instructions}\n{self.inputs}\n{self.outputs}\n{self.instructionPointer}'
 
 
 def compute(instructions, inputSignal, currentIndex, outputSignals):
@@ -80,32 +83,28 @@ def compute(instructions, inputSignal, currentIndex, outputSignals):
     return (instructions, index, programStatus)
 
 
-# possibleSettings = list(itertools.permutations([0, 1, 2, 3, 4]))
+possibleSettings = list(itertools.permutations([0, 1, 2, 3, 4]))
 
-# bestSetting = (0, 0)
-# for possibleSetting in possibleSettings:
-#     inputSignal = [0]
-#     outputSignals = []
-#     for setting in possibleSetting:
-#         inputSignal.insert(0, setting)
-#         opCodes = originalProgram
-#         # inputSignal.append(compute(opCodes, inputSignal))
-#         compute(opCodes, inputSignal, 0, outputSignals)
-#         for output in outputSignals:
-#             inputSignal.append(output)
-#         outputSignals = []
-#     if inputSignal[-1] > bestSetting[1]:
-#         bestSetting = (possibleSetting, inputSignal[-1])
+bestSetting = (0, 0)
+for possibleSetting in possibleSettings:
+    inputSignal = [0]
+    outputSignals = []
+    for setting in possibleSetting:
+        inputSignal.insert(0, setting)
+        opCodes = originalProgram
+        # inputSignal.append(compute(opCodes, inputSignal))
+        compute(opCodes, inputSignal, 0, outputSignals)
+        for output in outputSignals:
+            inputSignal.append(output)
+        outputSignals = []
+    if inputSignal[-1] > bestSetting[1]:
+        bestSetting = (possibleSetting, inputSignal[-1])
 
-# print('Part 1: ', bestSetting[1])
+print('Part 1: ', bestSetting[1])
 
-# input signal, instructions, pointer to current instruction,
-# bestSetting = (0, 0)
-
-
+# Could not get part 2 :(
 possibleSettings = list(itertools.permutations([5, 6, 7, 8, 9]))
 possibleSetting = [9, 8, 7, 6, 5]
-# inputSignal = [setting for setting in possibleSetting]
 opCodes = originalProgram
 
 feedbackLoop = []
