@@ -10,10 +10,33 @@ with open(file_to_open) as instructionInput:
 originalProgram = [code for code in opCodes]
 
 
-def compute(instructions, inputSignal, currentIndex):
+class Amplifier:
+    def __init__(self, instructions, name):
+        self.instructions = instructions
+        self.inputs = []
+        self.instructionPointer = 0
+        self.programStatus = ''
+        self.outputs = []
+        self.name = name
+
+    def runAmplifier(self):
+        programResponse = compute(
+            self.instructions, self.inputs, self.instructionPointer, self.outputs)
+        self.instructions = programResponse[0]
+        self.instructionPointer = programResponse[1]
+        self.programStatus = programResponse[2]
+
+    def waitingForInput(self):
+        return self.programStatus == 'WAITING'
+
+    def halted(self):
+        return self.programStatus == 'HALT'
+
+
+def compute(instructions, inputSignal, currentIndex, outputSignals):
     index = currentIndex
     # outputCode = 0
-    programStatus = ''
+    programStatus = 'CONTINUE'
     while index < len(instructions):
         opCode = instructions[index] % 100
         if opCode == 99:
@@ -33,7 +56,7 @@ def compute(instructions, inputSignal, currentIndex):
             index += 4
         if opCode == 3:
             # inputValue = setting if setting != -1 else signal
-            if len(inputSignal) < 1:
+            if len(inputSignal) == 0:
                 programStatus = 'WAITING'
                 break
             instructions[parameter1] = inputSignal.pop(0)
@@ -42,7 +65,7 @@ def compute(instructions, inputSignal, currentIndex):
         if opCode == 4:
             # outputCode = instructions[parameter1]
             # programStatus = 'OUTPUT'
-            inputSignal.append(instructions[parameter1])
+            outputSignals.append(instructions[parameter1])
             index += 2
         if opCode == 5:
             index = instructions[parameter2] if instructions[parameter1] != 0 else index + 3
@@ -62,34 +85,46 @@ def compute(instructions, inputSignal, currentIndex):
 # bestSetting = (0, 0)
 # for possibleSetting in possibleSettings:
 #     inputSignal = [0]
+#     outputSignals = []
 #     for setting in possibleSetting:
 #         inputSignal.insert(0, setting)
 #         opCodes = originalProgram
 #         # inputSignal.append(compute(opCodes, inputSignal))
-#         compute(opCodes, inputSignal, 0)
+#         compute(opCodes, inputSignal, 0, outputSignals)
+#         for output in outputSignals:
+#             inputSignal.append(output)
+#         outputSignals = []
 #     if inputSignal[-1] > bestSetting[1]:
-#         bestSetting = (possibleSetting, inputSignal[0])
+#         bestSetting = (possibleSetting, inputSignal[-1])
 
 # print('Part 1: ', bestSetting[1])
 
-# input signal, instructions, pointer to current instruction, 
+# input signal, instructions, pointer to current instruction,
 # bestSetting = (0, 0)
 
 
 possibleSettings = list(itertools.permutations([5, 6, 7, 8, 9]))
-possibleSetting = [9,8,7,6,5]   
+possibleSetting = [9, 8, 7, 6, 5]
 # inputSignal = [setting for setting in possibleSetting]
 opCodes = originalProgram
 
-feedbackLoop = deque([(opCodes, 0) for setting in possibleSetting])
-inputSignals = [0]
-setingsToUse = [a for a in possibleSetting]
+feedbackLoop = []
+completedAmps = []
+for setting in possibleSetting:
+    feedbackLoop.append(Amplifier(opCodes, setting))
+    feedbackLoop[-1].inputs.append(setting)
+
+feedbackLoop[0].inputs.append(0)
 while len(feedbackLoop) > 0:
-    currentAmp = feedbackLoop.popleft()
-    if len(setingsToUse) > 0:
-        inputSignals.insert(0, setingsToUse.pop(0))
-    programResponse = compute(currentAmp[0], inputSignals, currentAmp[1])
-    if programResponse[2] == 'WAITING':
-        feedbackLoop.append((programResponse[0], programResponse[1]))
-        
-print(inputSignals)
+    currentAmp = feedbackLoop.pop(0)
+    currentAmp.runAmplifier()
+    for output in currentAmp.outputs:
+        feedbackLoop[0].inputs.append(output)
+    if currentAmp.halted():
+        completedAmps.append(currentAmp)
+    currentAmp.outputs = []  # this will probably mess with the one we are storing
+    if currentAmp.waitingForInput():
+        feedbackLoop.append(currentAmp)
+    if len(completedAmps) == len(possibleSetting):
+        break
+print(completedAmps)
