@@ -10,10 +10,10 @@ with open(file_to_open) as instructionInput:
 originalProgram = [code for code in opCodes]
 
 
-def compute(instructions, setting, signal):
-    index = 0
-    outputCode = 0
-    programStatus = 'CONTINUE'
+def compute(instructions, inputSignal, currentIndex):
+    index = currentIndex
+    # outputCode = 0
+    programStatus = ''
     while index < len(instructions):
         opCode = instructions[index] % 100
         if opCode == 99:
@@ -32,15 +32,18 @@ def compute(instructions, setting, signal):
                 instructions[parameter2]
             index += 4
         if opCode == 3:
-            inputValue = setting if setting != -1 else signal
-            instructions[parameter1] = inputValue
+            # inputValue = setting if setting != -1 else signal
+            if len(inputSignal) < 1:
+                programStatus = 'WAITING'
+                break
+            instructions[parameter1] = inputSignal.pop(0)
             index += 2
-            setting = -1
+            # setting = -1
         if opCode == 4:
-            outputCode = instructions[parameter1]
-            programStatus = 'OUTPUT'
+            # outputCode = instructions[parameter1]
+            # programStatus = 'OUTPUT'
+            inputSignal.append(instructions[parameter1])
             index += 2
-            break
         if opCode == 5:
             index = instructions[parameter2] if instructions[parameter1] != 0 else index + 3
         if opCode == 6:
@@ -51,18 +54,42 @@ def compute(instructions, setting, signal):
         if opCode == 8:
             instructions[parameter3] = 1 if instructions[parameter1] == instructions[parameter2] else 0
             index += 4
-    return outputCode
+    return (instructions, index, programStatus)
 
 
-possibleSettings = list(itertools.permutations([0, 1, 2, 3, 4]))
+# possibleSettings = list(itertools.permutations([0, 1, 2, 3, 4]))
 
-bestSetting = (0, 0)
-for possibleSetting in possibleSettings:
-    inputSignal = 0
-    for setting in possibleSetting:
-        opCodes = originalProgram
-        inputSignal = compute(opCodes, setting, inputSignal)
-    if inputSignal > bestSetting[1]:
-        bestSetting = (possibleSetting, inputSignal)
+# bestSetting = (0, 0)
+# for possibleSetting in possibleSettings:
+#     inputSignal = [0]
+#     for setting in possibleSetting:
+#         inputSignal.insert(0, setting)
+#         opCodes = originalProgram
+#         # inputSignal.append(compute(opCodes, inputSignal))
+#         compute(opCodes, inputSignal, 0)
+#     if inputSignal[-1] > bestSetting[1]:
+#         bestSetting = (possibleSetting, inputSignal[0])
 
-print('Part 1: ', bestSetting[1])
+# print('Part 1: ', bestSetting[1])
+
+# input signal, instructions, pointer to current instruction, 
+# bestSetting = (0, 0)
+
+
+possibleSettings = list(itertools.permutations([5, 6, 7, 8, 9]))
+possibleSetting = [9,8,7,6,5]   
+# inputSignal = [setting for setting in possibleSetting]
+opCodes = originalProgram
+
+feedbackLoop = deque([(opCodes, 0) for setting in possibleSetting])
+inputSignals = [0]
+setingsToUse = [a for a in possibleSetting]
+while len(feedbackLoop) > 0:
+    currentAmp = feedbackLoop.popleft()
+    if len(setingsToUse) > 0:
+        inputSignals.insert(0, setingsToUse.pop(0))
+    programResponse = compute(currentAmp[0], inputSignals, currentAmp[1])
+    if programResponse[2] == 'WAITING':
+        feedbackLoop.append((programResponse[0], programResponse[1]))
+        
+print(inputSignals)
