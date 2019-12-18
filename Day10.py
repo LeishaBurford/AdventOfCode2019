@@ -11,9 +11,6 @@ def prettyPrintMatrix(matrix):
         print(row)
 
 
-prettyPrintMatrix(asteroids)
-
-
 def getAsteroidLocations(asteroidLocations, position):
     postions = []
     for x, row in enumerate(asteroidLocations):
@@ -58,6 +55,7 @@ def getDirectAsteroids(asteroidLocations, stationLocation):
         total += 1
     return total
 
+
 def getSlope(a, b):
     return (a[0] - b[0]) / (a[1] - b[1])
 
@@ -83,4 +81,21 @@ for position in possibleStationLocations:
     if asteroidCount > bestAsteroidVisibility[1]:
         bestAsteroidVisibility = (position, asteroidCount)
 
-print(bestAsteroidVisibility)
+print('Part 1: ', bestAsteroidVisibility)
+
+lastVaporized = (0, 0)
+station = bestAsteroidVisibility[0]
+for vaporizedAsteroid in range(0, 200):
+    # prettyPrintMatrix(asteroids)
+    for quad in getQuadrants(asteroids, station):
+        slopes = []
+        for location in quad:
+            if location != station:
+                slope = getSlope(station, location)
+                if slope not in slopes:
+                    slopes.append(slope)
+                    asteroids[location[0]][location[1]] = 'x'
+                    lastVaporized = location
+                    print(lastVaporized)
+
+print('Part 2: ', lastVaporized, (lastVaporized[1] * 100) + lastVaporized[0])
