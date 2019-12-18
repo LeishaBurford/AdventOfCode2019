@@ -56,6 +56,22 @@ def getDirectAsteroids(asteroidLocations, stationLocation):
     return total
 
 
+def vaporizeDirectAsteroids(asteroidLocations, stationLocation, directionOfVaporizer):
+    a = stationLocation[0]
+    b = stationLocation[1]
+    verticalLineOfSight = [location[a] for location in asteroids]
+
+    if directionOfVaporizer == 1:
+        toBeVaporized = (a, asteroidLocations[b][:a].index('#'))
+    if directionOfVaporizer == 3:
+        toBeVaporized = (a, asteroidLocations[b][a + 1:].index('#'))
+    if directionOfVaporizer == 0:
+        toBeVaporized = (verticalLineOfSight[:b].index('#'), b)
+    if directionOfVaporizer == 2:
+        toBeVaporized = (verticalLineOfSight[b + 1:].index('#'), b)
+    asteroidLocations[toBeVaporized[0]][toBeVaporized[1]] = 'x'
+
+
 def getSlope(a, b):
     return (a[0] - b[0]) / (a[1] - b[1])
 
@@ -88,6 +104,9 @@ station = bestAsteroidVisibility[0]
 for vaporizedAsteroid in range(0, 200):
     # prettyPrintMatrix(asteroids)
     for quad in getQuadrants(asteroids, station):
+        vaporizeDirectAsteroids(
+            asteroids, station, vaporizedAsteroid % 4)
+        # prettyPrintMatrix(asteroids)
         slopes = []
         for location in quad:
             if location != station:
@@ -96,6 +115,6 @@ for vaporizedAsteroid in range(0, 200):
                     slopes.append(slope)
                     asteroids[location[0]][location[1]] = 'x'
                     lastVaporized = location
-                    print(lastVaporized)
+                    # print(lastVaporized)
 
 print('Part 2: ', lastVaporized, (lastVaporized[1] * 100) + lastVaporized[0])
