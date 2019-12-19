@@ -36,7 +36,7 @@ def getQuadrants(asteroidLocations, stationLocation):
                       for row in asteroidLocations[a + 1:]]
     fourthQuadrant = getAsteroidLocations(fourthQuadrant, (a + 1, b + 1))
 
-    return [firstQuadrant, secondQuadrant, thirdQuadrant, fourthQuadrant]
+    return [secondQuadrant, fourthQuadrant, thirdQuadrant, firstQuadrant]
 
 
 def getDirectAsteroids(asteroidLocations, stationLocation):
@@ -48,7 +48,7 @@ def getDirectAsteroids(asteroidLocations, stationLocation):
     if asteroidLocations[b][a + 1:].count('#') > 0:
         total += 1
 
-    verticalLineOfSight = [location[a] for location in asteroids]
+    verticalLineOfSight = [location[b] for location in asteroids]
     if verticalLineOfSight[:b].count('#') > 0:
         total += 1
     if verticalLineOfSight[b + 1:].count('#') > 0:
@@ -59,17 +59,27 @@ def getDirectAsteroids(asteroidLocations, stationLocation):
 def vaporizeDirectAsteroids(asteroidLocations, stationLocation, directionOfVaporizer):
     a = stationLocation[0]
     b = stationLocation[1]
-    verticalLineOfSight = [location[a] for location in asteroids]
-
-    if directionOfVaporizer == 1:
-        toBeVaporized = (a, asteroidLocations[b][:a].index('#'))
-    if directionOfVaporizer == 3:
-        toBeVaporized = (a, asteroidLocations[b][a + 1:].index('#'))
-    if directionOfVaporizer == 0:
-        toBeVaporized = (verticalLineOfSight[:b].index('#'), b)
-    if directionOfVaporizer == 2:
-        toBeVaporized = (verticalLineOfSight[b + 1:].index('#'), b)
-    asteroidLocations[toBeVaporized[0]][toBeVaporized[1]] = 'x'
+    verticalLineOfSight = [location[b] for location in asteroids]
+    toBeVaporized = False
+    if directionOfVaporizer == 3 and '#' in asteroidLocations[a][:b]:
+        thing = asteroidLocations[a][:b]
+        toBeVaporized = (a, asteroidLocations[a][:b][::-1].index('#') + b - 1)
+    
+    if directionOfVaporizer == 1 and '#' in asteroidLocations[a][b + 1:]:
+        thing = asteroidLocations[a][b + 1:]       
+        toBeVaporized = (a, asteroidLocations[a][b + 1:].index('#') + 1)
+    
+    if directionOfVaporizer == 0 and '#' in verticalLineOfSight[:a]:
+        thing = verticalLineOfSight[:a]               
+        toBeVaporized = (a - verticalLineOfSight[:a][::-1].index('#') - 1, b)
+    
+    if directionOfVaporizer == 2 and '#' in verticalLineOfSight[a + 1:]:
+        thing = verticalLineOfSight[a + 1:]
+        toBeVaporized = (verticalLineOfSight[a + 1:].index('#') + a + 1, b)
+    
+    if toBeVaporized != False:
+        asteroidLocations[toBeVaporized[0]][toBeVaporized[1]] = 'x'
+        print((toBeVaporized[0],toBeVaporized[1]))
 
 
 def getSlope(a, b):
@@ -115,6 +125,6 @@ for vaporizedAsteroid in range(0, 200):
                     slopes.append(slope)
                     asteroids[location[0]][location[1]] = 'x'
                     lastVaporized = location
-                    # print(lastVaporized)
+                    print(lastVaporized)
 
 print('Part 2: ', lastVaporized, (lastVaporized[1] * 100) + lastVaporized[0])
