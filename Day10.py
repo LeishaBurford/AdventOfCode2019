@@ -75,8 +75,6 @@ def vaporizeDirectAsteroids(asteroidLocations, stationLocation, directionOfVapor
         toBeVaporized = (verticalLineOfSight[a + 1:].index('#') + a + 1, b)
     if toBeVaporized != False:
         asteroidLocations[toBeVaporized[0]][toBeVaporized[1]] = 'x'
-        print((toBeVaporized[0], toBeVaporized[1]))
-        # prettyPrintMatrix(asteroidLocations)
 
 
 def sortSlopesForQuadrant(slopes, quadrant):
@@ -115,7 +113,6 @@ for position in possibleStationLocations:
                 if slope not in slopes:
                     slopes.append(slope)
         asteroidCount += len(slopes)
-    # print((position, asteroidCount))
     if asteroidCount > bestAsteroidVisibility[1]:
         bestAsteroidVisibility = (position, asteroidCount)
 
@@ -126,7 +123,6 @@ station = bestAsteroidVisibility[0]
 
 asteroidsBySlopeForAllQuadrants = []
 for quad in getQuadrants(asteroids, station):
-    # prettyPrintMatrix(quad)
     slopes = {}
     for location in quad:
         if location != station:
@@ -139,25 +135,20 @@ for quad in getQuadrants(asteroids, station):
         slopes[slope] = sorted(
             slopes[slope], key=lambda x: getManhattanDistance(station, x))
     asteroidsBySlopeForAllQuadrants.append(slopes)
-    # for slope in slopes:
-    #     location = slope[1]
-    #     asteroids[location[0]][location[1]] = 'x'
-    #     lastVaporized = location
-    #     print(lastVaporized)
+
 vaporizedAsteroid = 0
 while vaporizedAsteroid < 200:
-    # prettyPrintMatrix(asteroids)
     for i, quad in enumerate(asteroidsBySlopeForAllQuadrants):
         vaporizeDirectAsteroids(
             asteroids, station, i % 4)
         vaporizedAsteroid += 1
         slopes = sortSlopesForQuadrant(list(quad.keys()), i)
         for slope in slopes:
+            if vaporizedAsteroid >= 200:
+                break
             location = quad[slope].pop(0)
             asteroids[location[0]][location[1]] = 'x'
             vaporizedAsteroid += 1
-            print(location)
-            # prettyPrintMatrix(asteroids)
             lastVaporized = location
             if quad[slope] == []:
                 quad.pop(slope, None)
