@@ -76,7 +76,7 @@ def vaporizeDirectAsteroids(asteroidLocations, stationLocation, directionOfVapor
     if toBeVaporized != False:
         asteroidLocations[toBeVaporized[0]][toBeVaporized[1]] = 'x'
         print((toBeVaporized[0], toBeVaporized[1]))
-        prettyPrintMatrix(asteroidLocations)
+        # prettyPrintMatrix(asteroidLocations)
 
 
 def sortSlopesForQuadrant(slopes, quadrant):
@@ -144,19 +144,20 @@ for quad in getQuadrants(asteroids, station):
     #     asteroids[location[0]][location[1]] = 'x'
     #     lastVaporized = location
     #     print(lastVaporized)
-
-for vaporizedAsteroid in range(0, 200):
+vaporizedAsteroid = 0
+while vaporizedAsteroid < 200:
     # prettyPrintMatrix(asteroids)
     for i, quad in enumerate(asteroidsBySlopeForAllQuadrants):
         vaporizeDirectAsteroids(
             asteroids, station, i % 4)
-
+        vaporizedAsteroid += 1
         slopes = sortSlopesForQuadrant(list(quad.keys()), i)
         for slope in slopes:
             location = quad[slope].pop(0)
             asteroids[location[0]][location[1]] = 'x'
+            vaporizedAsteroid += 1
             print(location)
-            prettyPrintMatrix(asteroids)
+            # prettyPrintMatrix(asteroids)
             lastVaporized = location
             if quad[slope] == []:
                 quad.pop(slope, None)
