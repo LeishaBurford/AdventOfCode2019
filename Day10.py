@@ -63,10 +63,10 @@ def vaporizeDirectAsteroids(asteroidLocations, stationLocation, directionOfVapor
     toBeVaporized = False
     if directionOfVaporizer == 3 and '#' in asteroidLocations[a][:b]:
         thing = asteroidLocations[a][:b]
-        toBeVaporized = (a, asteroidLocations[a][:b][::-1].index('#') + b - 1)
+        toBeVaporized = (a, b - asteroidLocations[a][:b][::-1].index('#') - 1)
     if directionOfVaporizer == 1 and '#' in asteroidLocations[a][b + 1:]:
         thing = asteroidLocations[a][b + 1:]
-        toBeVaporized = (a, asteroidLocations[a][b + 1:].index('#') + 1)
+        toBeVaporized = (a, asteroidLocations[a][b + 1:].index('#') + b + 1)
     if directionOfVaporizer == 0 and '#' in verticalLineOfSight[:a]:
         thing = verticalLineOfSight[:a]
         toBeVaporized = (a - verticalLineOfSight[:a][::-1].index('#') - 1, b)
@@ -98,31 +98,31 @@ def getManhattanDistance(a, b):
     return abs(a[0] - b[0]) + abs(b[1] - a[1])
 
 
-# possibleStationLocations = []
-# for x, row in enumerate(asteroids):
-#     for y, col in enumerate(row):
-#         if asteroids[x][y] == '#':
-#             possibleStationLocations.append((x, y))
+possibleStationLocations = []
+for x, row in enumerate(asteroids):
+    for y, col in enumerate(row):
+        if asteroids[x][y] == '#':
+            possibleStationLocations.append((x, y))
 
-# bestAsteroidVisibility = ((0, 0), 0)
-# for position in possibleStationLocations:
-#     asteroidCount = getDirectAsteroids(asteroids, position)
-#     for quad in getQuadrants(asteroids, position):
-#         slopes = []
-#         for location in quad:
-#             if location != position:
-#                 slope = getSlope(position, location)
-#                 if slope not in slopes:
-#                     slopes.append(slope)
-#         asteroidCount += len(slopes)
-#     # print((position, asteroidCount))
-#     if asteroidCount > bestAsteroidVisibility[1]:
-#         bestAsteroidVisibility = (position, asteroidCount)
+bestAsteroidVisibility = ((0, 0), 0)
+for position in possibleStationLocations:
+    asteroidCount = getDirectAsteroids(asteroids, position)
+    for quad in getQuadrants(asteroids, position):
+        slopes = []
+        for location in quad:
+            if location != position:
+                slope = getSlope(position, location)
+                if slope not in slopes:
+                    slopes.append(slope)
+        asteroidCount += len(slopes)
+    # print((position, asteroidCount))
+    if asteroidCount > bestAsteroidVisibility[1]:
+        bestAsteroidVisibility = (position, asteroidCount)
 
-# print('Part 1: ', bestAsteroidVisibility)
+print('Part 1: ', bestAsteroidVisibility)
 
 lastVaporized = (0, 0)
-station = (3, 8)
+station = bestAsteroidVisibility[0]
 
 asteroidsBySlopeForAllQuadrants = []
 for quad in getQuadrants(asteroids, station):
