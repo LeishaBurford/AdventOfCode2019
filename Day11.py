@@ -25,7 +25,6 @@ def getParameter(instructions, index, parameterCode, relativeBase):
 def compute(instructions, inputSignal, currentIndex, outputSignals, relativeBase):
     index = currentIndex
     programStatus = 'CONTINUE'
-    # relativeBase = 0
     needSecondParam = [1, 2, 5, 6, 7, 8]
     needThirdParam = [1, 2, 7, 8]
     while index < len(instructions):
@@ -79,7 +78,6 @@ def move(position, moveCode):
     if moveCode == 3:
         return (position[0] - 1, position[1])
 
-
 def getRobotDirection(moveRight, currentDirection):
     if currentDirection == 0:
         return 1 if moveRight else 3
@@ -89,7 +87,6 @@ def getRobotDirection(moveRight, currentDirection):
         return 3 if moveRight else 1
     if currentDirection == 3:
         return 0 if moveRight else 2
-
 
 def paint(startingColour, program):
     halted = False
@@ -118,9 +115,6 @@ def paint(startingColour, program):
                 print('ahhhhh')
     return positions
 
-
-# print('Part 1:', len(paint(0, opCodes)))
-
 # reset computer for part 2
 opCodes = originalProgram
 
@@ -129,10 +123,8 @@ paintedWhite = [position for position in paintedPositions if paintedPositions[po
 
 invalidPoint = [point for point in paintedPositions if paintedPositions[point] != 1 and paintedPositions[point] != 0]
 
-# xSorted = sorted(paintedWhite, key=lambda x: x[0])
 xSorted = sorted(paintedPositions.keys(), key=lambda x: x[0])
 
-# ySorted = sorted(paintedWhite, key=lambda x: x[1])
 ySorted = sorted(paintedPositions.keys(), key=lambda x: x[1])
 
 for y in range(ySorted[-1][1], ySorted[0][1] - 1, -1):
@@ -143,10 +135,3 @@ for y in range(ySorted[-1][1], ySorted[0][1] - 1, -1):
             print(' ', end='')
     print()
 
-# for y in range(-50, 50):
-#     for x in range(-40,40):
-#         if (x, y) in paintedWhite:
-#             print('#', end='')
-#         else:
-#             print(' ', end='')
-#     print()
